@@ -1,0 +1,17 @@
+openssl ca -in server.csr -out server.crt -cert ca.crt -keyfile ca.key -config openssl.cnf
+openssl ca -in client.csr -out client.crt -cert ca.crt -keyfile ca.key -config openssl.cnf
+
+
+tar zcvf lxytls.tar.gz tls
+sudo docker cp lxytls.tar.gz HostU:/lxytls.tar.gz
+tar zxvf lxytls.tar.gz
+
+VM:	sudo ./tlsserver
+	sudo ifconfig tun0 192.168.53.1/24 up
+	sudo sysctl net.ipv4.ip_forward=1
+	sudo iptables -F
+
+U:	sudo ./tlsclient lxy 4433 seed dees
+打开新的dockerU:sudo docker exec -it HostU /bin/bash
+		sudo ifconfig tun0 192.168.53.5/24 up
+		route add -net 192.168.60.0/24 tun0
